@@ -25,3 +25,8 @@ class StudentDetails(models.Model):
     student_admission_to = models.CharField(max_length=100)
     student_dob = models.DateField()
 
+
+class ClassDetails(models.Model):
+    class_name = models.CharField(max_length=100)
+
+

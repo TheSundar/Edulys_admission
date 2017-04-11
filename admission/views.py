@@ -1,9 +1,16 @@
+import json
+
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
-from admission.models import StudentDetails
-from datetime import datetime
+from admission.models import StudentDetails, ClassDetails
+import datetime
+
 import re
 import sys
+
+from django.core import serializers
+
+
 
 # Create your views here.
 
@@ -54,7 +61,6 @@ class DataValidation(object):
         if 5-()
 
 def save_data(request):
-
     student_first_name = request.GET.get('st_fn')
     student_middle_name = request.GET.get('st_mn')
     student_last_name = request.GET.get('st_ln')
@@ -63,7 +69,9 @@ def save_data(request):
     student_gender = request.GET.get('st_gen')
     student_admission_to = request.GET.get('st_a2')
     student_dob = request.GET.get('st_dob')
+
     standard = ['LKG','UKG','Class1', 'Class2', 'Class3', 'Class4', 'Class5', 'Class6', 'Class7', 'Class8', 'Class9',
+
                 'Class10', 'Class11', 'Class12']
     gender = ['Male','Female','Other']
 
@@ -78,6 +86,7 @@ def save_data(request):
     student_dob = data_val.__primary_data_validation__('^[0-9]{4}-[0-9]{2}-[0-9]{2}$', student_dob, 'Student DOB')
     if student_dob != "":
         student_age = data_val.__age_calculate__(student_dob)
+
 
     if student_admission_to != "":
 
@@ -95,23 +104,30 @@ def save_data(request):
         return JsonResponse({'status': 'Failed',
                             'message': sys.exc_info()})
 
+
     else:
         try:
-            details = StudentDetails(student_first_name = student_first_name,
-                                    student_middle_name = student_middle_name,
-                                    student_last_name = student_last_name,
-                                    student_age = student_age,
-                                    student_blood_grp = student_blood_grp,
-                                    student_gender = student_gender,
-                                    student_admission_to = student_admission_to,
-                                    student_dob = student_dob)
-
+            details = StudentDetails(student_first_name=student_first_name,
+                                     student_middle_name=student_middle_name,
+                                     student_last_name=student_last_name,
+                                     student_age=student_age,
+                                     student_blood_grp=student_blood_grp,
+                                     student_gender=student_gender,
+                                     student_admission_to=student_admission_to,
+                                     student_dob=student_dob)
 
             details.save()
-            return JsonResponse({'status' : 'success', 'Message' : 'Successfully saved to DB'})
+            return JsonResponse({'status': 'success', 'Message': 'Successfully saved to DB'})
         except:
-            return JsonResponse({'status' : 'failure', 'Message' : 'Failed to saved to DB'})
+            return JsonResponse({'status': 'failure', 'Message': 'Failed to saved to DB'})
 
 
-
-    
+def get_class(request):
+    data = []
+    class_data = ClassDetails.objects.all()
+    for i in class_data:
+        data.append({
+            'id':i.id,
+            'class_name':i.class_name
+        })
+    return JsonResponse({'status': 'success', 'data': data})
