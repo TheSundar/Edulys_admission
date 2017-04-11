@@ -3,21 +3,19 @@ import json
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from admission.models import StudentDetails, ClassDetails
-import datetime
+from datetime import datetime
 
 import re
 import sys
 
 from django.core import serializers
 
-
-
 # Create your views here.
 
 class DataValidation(object):
-    invalid_param = []
 
     def __init__(self):
+        self.invalid_param = []
         pass
 
     def __primary_data_validation__(self,pattern, value, param):
@@ -28,10 +26,10 @@ class DataValidation(object):
             if re.findall(self.__pattern, self.__value) != []:
                 return self.__value
             else:
-                DataValidation.invalid_params.append(self.__param)
+                self.invalid_param.append(self.__param)
                 return ""
         else:
-            DataValidation.invalid_params.append(self.__param)
+            self.invalid_param.append(self.__param)
             return ""
 
     def __specific_data_validation__(self, data_list, value, param):
@@ -41,13 +39,16 @@ class DataValidation(object):
         if self.__value in self.__data_list:
             return self.__value
         else:
-            DataValidation.invalid_param.append(self.__param)
+            self.invalid_param.append(self.__param)
             return ""
 
     def __age_calculate__(self,DOB):
+        print DOB
+        print self.invalid_param
         self.__DOB = DOB
         b_date = datetime.strptime(self.__DOB, '%Y-%m-%d')
-        return (datetime.today() - b_date).days/365
+        self.age = (datetime.today() - b_date).days/365
+        return self.age
 
     def __class_validate__(self,admit_to):
         self.__admit_to = admit_to
@@ -56,9 +57,10 @@ class DataValidation(object):
         elif admit_to == 'UKG':
             self.__class_enum = 0
         else:
-            self.__class_enum = re.findall('Class([\d]+)',admit_to)[0]
+            self.__class_enum = eval(re.findall('Class([\d]+)',admit_to)[0])
 
-        if 5-()
+        if (self.age - (self.__class_enum + 1)) < 5:
+            self.invalid_param.append("Under Aged")
 
 def save_data(request):
     student_first_name = request.GET.get('st_fn')
@@ -77,7 +79,8 @@ def save_data(request):
 
     data_val = DataValidation()
     student_first_name = data_val.__primary_data_validation__('^[a-zA-Z]*[a-zA-Z]$', student_first_name, 'Student Middle Name')
-    student_middle_name = data_val.__primary_data_validation__('^[a-zA-Z]*[a-zA-Z]$', student_middle_name, 'Student Middle Name')
+    if student_middle_name != "":
+        student_middle_name = data_val.__primary_data_validation__('^[a-zA-Z]*[a-zA-Z]$', student_middle_name, 'Student Middle Name')
     student_last_name = data_val.__primary_data_validation__('^[a-zA-Z]*[a-zA-Z]$', student_last_name, 'Student Last Name')
     # student_age = data_val.__primary_data_validation__('^[0-9]*[0-9]$', student_age, 'Student Age')
     student_blood_grp = data_val.__primary_data_validation__('^[a-bA-BoO]+[+-]$', student_blood_grp, 'Student Blood Group')
@@ -89,15 +92,16 @@ def save_data(request):
 
 
     if student_admission_to != "":
-
+        data_val.__class_validate__(student_admission_to)
 
     try:
-        if len(DataValidation.invalid_param) > 0:
+        if len(data_val.invalid_param) > 0:
             invalid_string = ''
-            for i in DataValidation.invalid_param:
-                invalid_string += i+' '
+            for i in data_val.invalid_param:
+                invalid_string += i+', '
             else:
                 invalid_string += 'are invalid parameters'
+            # DataValidation.invalid_param = []
             return JsonResponse({'status': 'Failed',
                                 'message': invalid_string})
     except:
