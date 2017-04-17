@@ -25,6 +25,17 @@ class StudentDetails(models.Model):
     student_admission_to = models.CharField(max_length=100)
     student_dob = models.DateField()
 
+class ParentsDetails(models.Model):
+    student = models.ForeignKey(StudentDetails, blank=True)
+    parent_type = models.CharField(max_length=40)
+    parent_first_name = models.CharField(max_length=40)
+    parent_middle_name = models.CharField(max_length=40)
+    parent_last_name = models.CharField(max_length=40)
+    parent_occupation = models.CharField(max_length=50)
+    parent_income_pa = models.IntegerField(max_length=20)
+    parent_phone_number_1 = models.CharField(max_length=20)
+    parent_phone_number_2 = models.CharField(max_length=20)
+
 
 class ClassDetails(models.Model):
     class_name = models.CharField(max_length=100)

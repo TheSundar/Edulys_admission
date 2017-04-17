@@ -9,9 +9,10 @@ class DataValidation(object):
         self.invalid_param = []
         pass
 
-    def __primary_data_validation__(self,pattern, value, param):
+    def primary_data_validation(self,pattern, value, param):
         pattern_select = {'name_space': '^[a-zA-Z]*[a-zA-Z]$', 'date': '^[0-9]{4}-[0-9]{2}-[0-9]{2}$',
-                          'blood_grp': '^[a-bA-BoO]+[+-]$'}
+                          'blood_grp': '^[a-bA-BoO]+[+-]$', 'occupation':'^[a-zA-Z ]*[a-zA-Z]$',
+                          'income': '^[0-9]+$', 'phone_num': '^[+0-9]{10}$'}
         self.__pattern = pattern_select[pattern]
         self.__value = value
         self.__param = param
@@ -25,7 +26,7 @@ class DataValidation(object):
             self.invalid_param.append(self.__param)
             return ""
 
-    def __specific_data_validation__(self, data_list, value, param):
+    def specific_data_validation(self, data_list, value, param):
         self.__data_list = data_list
         self.__value = value
         self.__param = param
@@ -35,7 +36,7 @@ class DataValidation(object):
             self.invalid_param.append(self.__param)
             return ""
 
-    def __age_calculate__(self,DOB):
+    def age_calculate(self,DOB):
         print DOB
         print self.invalid_param
         self.__DOB = DOB
@@ -43,7 +44,7 @@ class DataValidation(object):
         self.age = (datetime.today() - b_date).days/365
         return self.age
 
-    def __class_validate__(self,admit_to):
+    def class_validate(self,admit_to):
         self.__admit_to = admit_to
         if admit_to == 'LKG':
             self.__class_enum = -1
